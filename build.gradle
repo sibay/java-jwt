@@ -3,6 +3,17 @@ plugins {
 }
 apply plugin: 'me.champeau.gradle.jmh'
 apply plugin: 'java'
+apply plugin: 'maven'
+
+apply plugin: 'maven'
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "file://$notizwerkSyncRepo")
+        }
+    }
+}
 
 sourceCompatibility = '1.8'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
@@ -14,6 +25,9 @@ if (!hasProperty('mainClass')) {
 repositories {
     mavenCentral()
     mavenLocal()
+    maven {
+        url notizwerkSyncRepo
+    }
 }
 
 task resolveSources << {
@@ -30,9 +44,8 @@ task resolveSources << {
     }
 }
 
-group = "com.auth0"
-version = "2.1.1-SNAPSHOT"
-
+group = "de.notizwerk.auth0"
+version = "3.0.0"
 
 sourceSets {
     legacy {
