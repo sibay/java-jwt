@@ -1,6 +1,7 @@
 package com.auth0.jwt;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
@@ -14,6 +15,8 @@ import javax.crypto.spec.SecretKeySpec;
 
 import java.util.Base64;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.boon.json.JsonParserAndMapper;
 import org.boon.json.JsonParserFactory;
 
@@ -75,22 +78,19 @@ public class JWTVerifier {
      * Performs JWT validation
      *
      * @param token token to verify
-     * @throws SignatureException    when signature is invalid
+	 * @return the verified claims(payload)
      * @throws JWTVerifyException    when expiration, issuer or audience are invalid
-     * @throws IllegalStateException when token's structure is invalid
      */
-    public Map<String, Object> verify(String token)
-            throws NoSuchAlgorithmException, InvalidKeyException, IllegalStateException,
-            IOException, SignatureException, JWTVerifyException {
+    public Map<String, Object> verify(String token) throws  JWTVerifyException {
         if (token == null || "".equals(token)) {
-            throw new IllegalStateException("token not set");
+            throw new JWTVerifyException("token not set");
         }
 
         String[] pieces = token.split("\\.");
 
         // check number of segments
         if (pieces.length != 3) {
-            throw new IllegalStateException("Wrong number of segments: " + pieces.length);
+            throw new JWTVerifyException("Wrong number of segments: " + pieces.length);
         }
 
         // get JWTHeader JSON object. Extract algorithm
@@ -112,13 +112,21 @@ public class JWTVerifier {
         return jwtPayload;
     }
 
-    void verifySignature(String[] pieces, String algorithm) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-        Mac hmac = Mac.getInstance(algorithm);
-        hmac.init(new SecretKeySpec(secret, algorithm));
-        byte[] sig = hmac.doFinal(new StringBuilder(pieces[0]).append(".").append(pieces[1]).toString().getBytes());
+    void verifySignature(String[] pieces, String algorithm) throws JWTVerifyException {
+        Mac hmac;
+		byte[] sig;
+		try {
+			hmac = Mac.getInstance(algorithm);
+			hmac.init(new SecretKeySpec(secret, algorithm));
+			sig = hmac.doFinal(new StringBuilder(pieces[0]).append(".").append(pieces[1]).toString().getBytes());
+		} catch (NoSuchAlgorithmException ex) {
+			throw new JWTVerifyException("unknown algorith " + algorithm + "in jwtheader",ex);
+		} catch (InvalidKeyException ex) {
+			throw new JWTVerifyException("invalid key",ex);
+		}
 
         if (!MessageDigest.isEqual(sig, decoder.decode(pieces[2]))) {
-            throw new SignatureException("signature verification failed");
+            throw new JWTVerifyException("signature verification failed");
         }
     }
 
@@ -164,37 +172,31 @@ public class JWTVerifier {
             if (audience.equals(audNode.toString()))
                 return;			
 		}
-//        if (audNode.isArray()) {
-//            for (JsonNode jsonNode : audNode) {
-//                if (audience.equals(jsonNode.textValue()))
-//                    return;
-//            }
-//        } else if (audNode.isTextual()) {
-//            if (audience.equals(audNode.textValue()))
-//                return;
-//        }
         throw new JWTAudienceException("jwt audience invalid", audNode);
     }
 
-    String getAlgorithm(Map<String,Object> jwtHeader) {
+    String getAlgorithm(Map<String,Object> jwtHeader) throws JWTVerifyException {
         final String algorithmName = jwtHeader.containsKey("alg") ? jwtHeader.get("alg").toString() : null;
 
         if (algorithmName == null) {
-            throw new IllegalStateException("algorithm not set");
+            throw new JWTVerifyException("algorithm not set");
         }
 
         if (algorithms.get(algorithmName) == null) {
-            throw new IllegalStateException("unsupported algorithm");
+            throw new JWTVerifyException("unsupported algorithm");
         }
 
         return algorithms.get(algorithmName);
     }
 
-//    JsonNode decodeAndParse(String b64String) throws IOException {
-	Map decodeAndParse(String b64String) throws IOException {
-        String jsonString = new String(decoder.decode(b64String), "UTF-8");
+	Map decodeAndParse(String b64String) {
+        String jsonString;
+		try {
+			jsonString = new String(decoder.decode(b64String), "UTF-8");
+		} catch (UnsupportedEncodingException ex) {
+			throw new RuntimeException("UTF-8 is unknown! This is nearly impossible", ex);
+		}
 		Map<String,Object> jwtHeader = this.fastParser.parseMap(jsonString);
-//        JsonNode jwtHeader = mapper.readValue(jsonString, JsonNode.class);
         return jwtHeader;
     }
 }

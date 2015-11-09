@@ -27,6 +27,7 @@ public class JWTSigner {
     private final byte[] secret;
 	private final JsonSerializer serializer = new JsonSerializerFactory().setSerializeAsSupport(false).useFieldsOnly().create();
 	private final Base64.Encoder encoder = Base64.getUrlEncoder().withoutPadding();
+	private Map<String,String> encodedHeaderMap = new HashMap<>();
 	
     public JWTSigner(String secret) {
         this(secret.getBytes());
@@ -60,7 +61,7 @@ public class JWTSigner {
         if (options != null && options.algorithm != null)
             algorithm = options.algorithm;
 
-        List<String> segments = new ArrayList<String>();
+        List<String> segments = new ArrayList<>();
         try {
             segments.add(encodedHeader(algorithm));
             segments.add(encodedPayload(claims, options));
@@ -87,13 +88,14 @@ public class JWTSigner {
         if (algorithm == null) { // default the algorithm if not specified
             algorithm = Algorithm.HS256;
         }
-
+		if ( this.encodedHeaderMap.containsKey(algorithm.name())) {
+			return this.encodedHeaderMap.get(algorithm.name());
+		}
         // create the header
-//        ObjectNode header = JsonNodeFactory.instance.objectNode();
-//        header.put("typ", "JWT");
-//        header.put("alg", algorithm.name());
 		String header = "{\"typ\":\"JWT\",\"alg\":\""+ algorithm.name() + "\"}";
-        return encoder.encodeToString(header.getBytes("UTF-8"));
+		String encodedHeader = encoder.encodeToString(header.getBytes("UTF-8"));
+		this.encodedHeaderMap.put(algorithm.name(), encodedHeader);
+		return encodedHeader;
     }
 
     /**
@@ -113,7 +115,6 @@ public class JWTSigner {
         if (options != null)
             processPayloadOptions(claims, options);
 
-//        String payload = new ObjectMapper().writeValueAsString(claims);
 		String payload = this.serializer.serialize(claims).toString();
         return encoder.encodeToString(payload.getBytes("UTF-8"));
     }
