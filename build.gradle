@@ -4,15 +4,27 @@ plugins {
 apply plugin: 'me.champeau.gradle.jmh'
 apply plugin: 'java'
 apply plugin: 'maven'
+apply plugin: 'maven-publish'
 
-apply plugin: 'maven'
-
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            repository(url: "file://$notizwerkSyncRepo")
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            
+            artifact sourceJar {
+                classifier "sources"
+            }
         }
     }
+    repositories {
+        maven {
+            url notizwerkSyncthingRepo
+        }
+    }
+}
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
 }
 
 sourceCompatibility = '1.8'
@@ -26,7 +38,7 @@ repositories {
     mavenCentral()
     mavenLocal()
     maven {
-        url notizwerkSyncRepo
+        url notizwerkSyncthingRepo
     }
 }
 
