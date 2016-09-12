@@ -9,20 +9,20 @@ An implementation of [JSON Web Tokens](http://self-issued.info/docs/draft-ietf-o
 
 ## Installation
 
+### Gradle
+
+```gradle
+compile 'de.notizwerk:java-jwt:3.0.0'
+```
+
 ### Maven
 
 ```xml
 <dependency>
-    <groupId>com.auth0</groupId>
+    <groupId>de.notizwerk</groupId>
     <artifactId>java-jwt</artifactId>
-    <version>2.2.0</version>
+    <version>3.0.0</version>
 </dependency>
-```
-
-### Gradle
-
-```gradle
-compile 'com.auth0:java-jwt:2.2.0'
 ```
 
 ## Usage
@@ -70,18 +70,33 @@ try {
 ```
 
 
-### Why another JSON Web Token implementation for Java?
+### Why a new fork of another JSON Web Token implementation for Java?
 
-We believe existing JWT implementations in Java are either too complex or not tested enough.
-This library aims to be simple and achieve the right level of abstraction.
+This project is a fork of the [Java JWT project of auth0](https://github.com/auth0/java-jwt).
+They believe existing JWT implementations in Java are either too complex or not tested enough. There library aims to be simple and achieve the right level of abstraction. 
+In our opinion they reached there goal with this implementation. The only difference between the original library and this fork is the use of faster JSON and base64 codecs. 
+For JSON coding we replaced jackson with boon and the apache base64 codec with the jdk base64 codecs. 
 
-## Issue Reporting
+... and we dont like maven (anymore) :-)
 
-If you have found a bug or if you have a feature request, please report them at this repository issues section. Please do not report security vulnerabilities on the public GitHub issue tracker. The [Responsible Disclosure Program](https://auth0.com/whitehat) details the procedure for disclosing security issues.
+### performance benchmark
+
+To compare the performance there is a benchmark. To start the benchmark checkout the benchmark branch and execute 
+
+```
+./gradlew jmh
+```
+
+To test the compability between this fork and the original fork start 
+```
+./gradlew compatibilityTest
+```
+
+Note: The benchmark and the compability test was made at the time the project was forked.
 
 ## Author
 
-[Auth0](auth0.com)
+[Notizwerk](notizwerk.de)
 
 ## License
 

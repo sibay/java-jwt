@@ -30,8 +30,8 @@ task resolveSources << {
     }
 }
 
-group = "com.auth0"
-version = "2.1.1-SNAPSHOT"
+group = "de.notizwerk"
+version = "3.0.0"
 
 
 sourceSets {
