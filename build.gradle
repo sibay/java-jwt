@@ -3,6 +3,9 @@ plugins {
 }
 apply plugin: 'me.champeau.gradle.jmh'
 apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'signing'
+
 
 sourceCompatibility = '1.8'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
@@ -64,6 +67,63 @@ dependencies {
     jmh 'io.fastjson:boon:0.33'
 }
 
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { deployment -> signing.signPom(deployment) }
+           
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+               authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+              authentication(userName: ossrhUsername, password: ossrhPassword)
+            }            
+            pom.project {
+                name "Java JWT"
+                description "Java implementation of JSON Web Token developed against draft-ietf-oauth-json-web-token-08."
+                url "https://github.com/sibay/java-jwt"
+                scm {
+                    url "https://github.com/sibay/java-jwt"
+                    developerConnection "scm:git:git@github.com:sibay/java-jwt.git"
+                    connection "scm:git:git@github.com:sibay/java-jwt.git"
+                }
+                licenses {
+                    license {
+                        name 'The MIT License'
+                        url 'http://www.opensource.org/licenses/mit-license.php'
+                        distribution 'repo'
+                    }
+                }
+                developers {
+                    developer {
+                      id 'sibay'
+                      name 'Tarek El-Sibay'
+                      email 't.elsibay@notizwerk.de'
+                    }
+                }
+            }
+        }
+    }
+}
 // check if the new implementation generates the same output as the old one:
 //
 //  ./gradlew compatibilityTest
