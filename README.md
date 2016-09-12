@@ -74,11 +74,11 @@ They believe existing JWT implementations in Java are either too complex or not 
 In our opinion they reached there goal with this implementation. The only difference between the original library and this fork is the use of faster JSON and base64 codecs. 
 For JSON coding we replaced jackson with boon and the apache base64 codec with the jdk base64 codecs. 
 
-... and we dont like maven (anymore) :-)
+... and our favorite build tool is gradle :-)
 
 ### performance benchmark
 
-To compare the performance there is a benchmark. To start the benchmark checkout the benchmark branch and execute 
+To compare the performance between the auth0 and this implementation start the benchmark. To start the benchmark checkout the benchmark branch and execute 
 
 ```
 ./gradlew jmh
