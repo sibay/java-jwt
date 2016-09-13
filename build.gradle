@@ -14,28 +14,9 @@ if (!hasProperty('mainClass')) {
     ext.mainClass = ''
 }
 
-repositories {
-    mavenCentral()
-    mavenLocal()
-}
-
-task resolveSources << {
-    def componentIds = configurations.compile.incoming.resolutionResult.allDependencies.collect { it.selected.id }
-    componentIds += configurations.testCompile.incoming.resolutionResult.allDependencies.collect { it.selected.id }
-
-    def result = dependencies.createArtifactResolutionQuery()
-        .forComponents(componentIds)
-        .withArtifacts(JvmLibrary, SourcesArtifact, JavadocArtifact)
-        .execute()
-
-    for (component in result.resolvedComponents) {
-        component.getArtifacts(SourcesArtifact).each { println "Source artifact for ${component.id}: ${it.file}" }
-    }
-}
-
 group = "de.notizwerk"
 version = "3.0.1-SNAPSHOT"
-
+ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
 sourceSets {
     legacy {
@@ -67,6 +48,11 @@ dependencies {
     jmh 'io.fastjson:boon:0.33'
 }
 
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
 task javadocJar(type: Jar) {
     classifier = 'javadoc'
     from javadoc
@@ -82,6 +68,7 @@ artifacts {
 }
 
 signing {
+    required { isReleaseVersion && gradle.taskGraph.hasTask("uploadArchives") }
     sign configurations.archives
 }
 
@@ -158,3 +145,17 @@ task wrapper(type: Wrapper) {
     gradleVersion = '2.8'
 }
 
+
+task resolveSources << {
+    def componentIds = configurations.compile.incoming.resolutionResult.allDependencies.collect { it.selected.id }
+    componentIds += configurations.testCompile.incoming.resolutionResult.allDependencies.collect { it.selected.id }
+
+    def result = dependencies.createArtifactResolutionQuery()
+        .forComponents(componentIds)
+        .withArtifacts(JvmLibrary, SourcesArtifact, JavadocArtifact)
+        .execute()
+
+    for (component in result.resolvedComponents) {
+        component.getArtifacts(SourcesArtifact).each { println "Source artifact for ${component.id}: ${it.file}" }
+    }
+}
