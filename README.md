@@ -1,8 +1,9 @@
 # Java JWT
 
+[![Build Status](https://travis-ci.org/auth0/java-jwt.svg?branch=master)](https://travis-ci.org/auth0/java-jwt)
 [![License](http://img.shields.io/:license-mit-blue.svg?style=flat)](http://doge.mit-license.org)
 
-An implementation of [JSON Web Tokens](http://self-issued.info/docs/draft-ietf-oauth-json-web-token.html) developed against `draft-ietf-oauth-json-web-token-08`.
+An implementation of [JSON Web Tokens](http://self-issued.info/docs/draft-ietf-oauth-json-web-token.html) developed against `draft-ietf-oauth-json-web-token-08` forked from auth0.
 
 ## Installation
 
@@ -71,7 +72,8 @@ try {
 
 This project is a fork of the [Java JWT project of auth0](https://github.com/auth0/java-jwt).
 They believe existing JWT implementations in Java are either too complex or not tested enough. There library aims to be simple and achieve the right level of abstraction. 
-In our opinion they reached there goal with this implementation. The only difference between the original library and this fork is the use of faster JSON and base64 codecs. 
+
+In our opinion they reached there goal with their implementation. The only difference between the original library and this fork is the use of faster JSON and base64 codecs. 
 For JSON coding we replaced jackson with boon and the apache base64 codec with the jdk base64 codecs. 
 
 ... and our favorite build tool is gradle :-)
