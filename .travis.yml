@@ -4,4 +4,3 @@ jdk:
 branches:
   only:
   - master
-script: bundle exec ./gradlew assemble -P ossrhUsername=USER -P ossrhPassword=PASS
