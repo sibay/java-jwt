@@ -1,6 +1,6 @@
 # Java JWT
 
-[![Build Status](https://travis-ci.org/auth0/java-jwt.svg?branch=master)](https://travis-ci.org/auth0/java-jwt)
+[![Build Status](https://travis-ci.org/sibay/java-jwt.svg?branch=master)](https://travis-ci.org/sibay/java-jwt)
 [![License](http://img.shields.io/:license-mit-blue.svg?style=flat)](http://doge.mit-license.org)
 
 An implementation of [JSON Web Tokens](http://self-issued.info/docs/draft-ietf-oauth-json-web-token.html) developed against `draft-ietf-oauth-json-web-token-08` forked from auth0.
